@@ -1,15 +1,12 @@
-import express, { Request, Response } from 'express'
-import bodyParser from 'body-parser'
+import express from 'express';
 
-const app: express.Application = express()
-const address: string = "0.0.0.0:3000"
+import { fetchAllRoutes } from './routes/allRoutes';
 
-app.use(bodyParser.json())
+const app: express.Application = express();
+const port = 3000;
 
-app.get('/', function (req: Request, res: Response) {
-    res.send('Hello World!')
-})
+fetchAllRoutes(app);
 
-app.listen(3000, function () {
-    console.log(`starting app on: ${address}`)
-})
+app.listen(port, () => {
+    console.log(`local server is working on port: ${port}`);
+});
