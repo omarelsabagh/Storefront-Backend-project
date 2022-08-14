@@ -35,6 +35,8 @@ npm run lint        -->  to lint the code.
 POSTGRES_HOST=127.0.0.1 
 POSTGRES_DB=storefront
 POSTGRES_TEST_DB=storefront_test
+POSTGRES_USER=dell
+POSTGRES_PASSWORD=01155388590
 BCRYPT_PASSWORD=my-bcrypt-password
 SALT_ROUNDS=10
 TOKEN_SECRET=my-secret-token
@@ -49,7 +51,19 @@ PORT=3000
    
   -CREATE DATABASE storefront_test   //for test database
 
-# 2- Database Schema and structure. =================================================
+# 2- Connect to database
+
+using postgres pool method
+
+const Client = new Pool({
+    host: POSTGRES_HOST,
+    database: ENV === 'test' ? POSTGRES_TEST_DB : POSTGRES_DB,
+    user: POSTGRES_USER,
+    password: POSTGRES_PASSWORD,
+});
+
+
+# 3- Database Schema and structure. =================================================
 
  ===users table===
 
