@@ -1,10 +1,11 @@
 import express, { Request, Response } from 'express';
 import { Products } from '../models/products.model';
+import authMiddleware from './../middlewares/authmiddleware';
 
 function productsHandeler(app: express.Application) {
-    app.post('/products', express.json(), create);
-    app.get('/products', express.json(), index);
-    app.get('/products/:id', express.json(), show);
+    app.post('/products', express.json(), authMiddleware, create);
+    app.get('/products', express.json(), authMiddleware, index);
+    app.get('/products/:id', express.json(), authMiddleware, show);
 }
 
 const products = new Products();

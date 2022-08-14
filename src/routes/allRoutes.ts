@@ -4,6 +4,7 @@ import ordersHandeler from './../handelers/orders.handeler';
 import userHandeler from './../handelers/users.handeler';
 import orderProductHandeler from './../handelers/orderproduct.handeler';
 
+//not to import all the functions in the server file
 export function fetchAllRoutes(app: express.Application) {
     productsHandeler(app);
     userHandeler(app);

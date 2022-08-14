@@ -1,12 +1,14 @@
 import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import { fetchAllRoutes } from './routes/allRoutes';
 
-const app: express.Application = express();
-const port = 3000;
+export const app: express.Application = express();
+//env variable for the port
+const port = process.env.PORT;
 
+// allRoutes file in routes folder
 fetchAllRoutes(app);
 
-app.listen(port, () => {
-    console.log(`local server is working on port: ${port}`);
-});
+app.listen(port);

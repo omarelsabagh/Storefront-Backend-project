@@ -1,8 +1,14 @@
 import express, { Request, Response } from 'express';
 import { Orderproducts } from './../models/orderproduct.model';
+import authMiddleware from './../middlewares/authmiddleware';
 
 function orderProductHandeler(app: express.Application) {
-    app.post('/orders/:id/products', express.json(), addProductToOrder);
+    app.post(
+        '/orders/:id/products',
+        express.json(),
+        authMiddleware,
+        addProductToOrder
+    );
 }
 
 const orderproducts = new Orderproducts();

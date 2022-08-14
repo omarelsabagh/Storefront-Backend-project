@@ -1,23 +1,37 @@
 import Client from './../database';
 
+interface Order {
+    id?: number | string;
+    status: string;
+    user_id: number | string;
+}
 export class Orders {
     //add order
-    async addOrder(orderStatus: string, quantity: number, userId: string) {
+    async addOrder(orderStatus: string, userId: string): Promise<Order> {
         try {
             const conn = await Client.connect();
-            const sql = `INSERT INTO orders ( status, quantity,user_id ) VALUES ($1,$2,$3) RETURNING *`;
+            const sql = `INSERT INTO orders ( status,user_id ) VALUES ($1,$2) RETURNING *`;
 
-            const addedOrders = await conn.query(sql, [
-                orderStatus,
-                quantity,
-                userId,
-            ]);
+            const addedOrders = await conn.query(sql, [orderStatus, userId]);
 
             conn.release();
 
-            return addedOrders.rows;
+            return addedOrders.rows[0];
         } catch (error) {
             throw new Error(`couldnt add an order: ${error}`);
+        }
+    }
+
+    async deleteAllOrders(): Promise<void> {
+        try {
+            const conn = await Client.connect();
+            const sql = `DELETE FROM orders`;
+
+            await conn.query(sql);
+
+            conn.release();
+        } catch (error) {
+            throw new Error(`couldn't delete all orders: ${error}`);
         }
     }
 }

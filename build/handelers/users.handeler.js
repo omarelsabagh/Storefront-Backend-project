@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,53 +6,79 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const users_model_1 = require("../models/users.model");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const authmiddleware_1 = __importDefault(require("./../middlewares/authmiddleware"));
+dotenv_1.default.config();
 function userHandeler(app) {
     app.post('/users', express_1.default.json(), create);
-    app.get('/users', express_1.default.json(), index);
-    app.get('/users/:id', express_1.default.json(), show);
+    app.post('/users/signin', express_1.default.json(), signin);
+    app.get('/users', express_1.default.json(), authmiddleware_1.default, index);
+    app.get('/users/:id', express_1.default.json(), authmiddleware_1.default, show);
 }
 const users = new users_model_1.Users();
 //create user
-function create(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const username = req.body.username;
-            const password = req.body.password;
-            const addedUser = yield users.createUser(username, password);
-            var Token = jsonwebtoken_1.default.sign({ user: addedUser }, `${process.env.TOKEN_SECRET}`);
-            res.json({ message: 'user added to DB successfully', Token: Token });
+async function create(req, res) {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+        const addedUser = await users.createUser(username, password);
+        if (addedUser.check == 1) {
+            res.json({
+                Error: 'username registered already, try another name',
+            });
         }
-        catch (error) {
-            res.status(400);
-            res.json(error);
+        else {
+            res.json({
+                message: 'user added to DB successfully',
+                addedUser: addedUser
+            });
         }
-    });
+    }
+    catch (error) {
+        res.status(400);
+        res.json(error);
+    }
+}
+//signin users
+async function signin(req, res) {
+    try {
+        const username = req.body.username;
+        const password = req.body.password;
+        const signeduser = await users.signUsers(username, password);
+        if (signeduser) {
+            const Token = jsonwebtoken_1.default.sign({ user: signeduser }, `${process.env.TOKEN_SECRET}`);
+            res.json({ message: 'sign in success', signeduser, Token });
+        }
+        else {
+            res.json({ message: 'error: invalid username or password' });
+        }
+    }
+    catch (error) {
+        res.status(400);
+        res.json(error);
+    }
 }
 //get all users
-function index(_req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const allUsers = yield users.getAllUsers();
-            res.json({ message: 'get all users from DB successfully', allUsers });
-        }
-        catch (error) {
-            res.status(400);
-            res.json(error);
-        }
-    });
+async function index(_req, res) {
+    try {
+        const allUsers = await users.getAllUsers();
+        res.json({ message: 'get all users from DB successfully', allUsers });
+    }
+    catch (error) {
+        res.status(400);
+        res.json(error);
+    }
 }
 //get one user
-function show(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            const userId = parseInt(req.params.id);
-            const oneUser = yield users.getOneUser(userId);
-            res.json({ message: 'get one user from DB successfully', oneUser });
-        }
-        catch (error) {
-            res.status(400);
-            res.json(error);
-        }
-    });
+async function show(req, res) {
+    try {
+        const userId = parseInt(req.params.id);
+        const oneUser = await users.getOneUser(userId);
+        res.json({ message: 'get one user from DB successfully', oneUser });
+    }
+    catch (error) {
+        res.status(400);
+        res.json(error);
+    }
 }
 exports.default = userHandeler;

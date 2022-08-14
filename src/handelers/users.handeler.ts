@@ -1,11 +1,15 @@
 import express, { Request, Response } from 'express';
 import { Users } from '../models/users.model';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import authMiddleware from './../middlewares/authmiddleware';
+dotenv.config();
 
 function userHandeler(app: express.Application) {
     app.post('/users', express.json(), create);
-    app.get('/users', express.json(), index);
-    app.get('/users/:id', express.json(), show);
+    app.post('/users/signin', express.json(), signin);
+    app.get('/users', express.json(), authMiddleware, index);
+    app.get('/users/:id', express.json(), authMiddleware, show);
 }
 
 const users = new Users();
@@ -17,12 +21,39 @@ async function create(req: Request, res: Response) {
         const password: string = req.body.password;
 
         const addedUser = await users.createUser(username, password);
+        //if the user is registered before check if there add key to the object called check with value 1
+        if (addedUser.check == 1) {
+            res.json({
+                Error: 'username registered already, try another name',
+            });
+        } else {
+            res.json({
+                message: 'user added to DB successfully',
+                addedUser: addedUser,
+            });
+        }
+    } catch (error) {
+        res.status(400);
+        res.json(error);
+    }
+}
+//signin users
 
-        var Token = jwt.sign(
-            { user: addedUser },
-            `${process.env.TOKEN_SECRET}`
-        );
-        res.json({ message: 'user added to DB successfully', Token: Token });
+async function signin(req: Request, res: Response) {
+    try {
+        const username: string = req.body.username;
+        const password: string = req.body.password;
+        const signeduser = await users.signUsers(username, password);
+        if (signeduser) {
+            //CREATE THE TOKEN
+            const Token = jwt.sign(
+                { user: signeduser },
+                `${process.env.TOKEN_SECRET}`
+            );
+            res.json({ message: 'sign in success', signeduser, Token });
+        } else {
+            res.json({ message: 'error: invalid username or password' });
+        }
     } catch (error) {
         res.status(400);
         res.json(error);
@@ -55,4 +86,5 @@ async function show(req: Request, res: Response) {
         res.json(error);
     }
 }
+
 export default userHandeler;
