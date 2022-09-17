@@ -5,9 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+//to use the testing environment for testing
 process.env.ENV = 'test';
 const products_model_1 = require("../models/products.model");
 const products = new products_model_1.Products();
+//tsting if functions defined
 describe('Testing if the Product model functions are defined', () => {
     it('Expect index model to be defined', () => {
         expect(products.showAllProducts).toBeDefined();
@@ -19,6 +21,7 @@ describe('Testing if the Product model functions are defined', () => {
         expect(products.getOneProduct).toBeDefined();
     });
 });
+//tsting if functions work correctly
 describe('Testing if the Products model functions work correctly', () => {
     it('Expect index method to return empty array', async () => {
         const result = await products.showAllProducts();
@@ -28,8 +31,8 @@ describe('Testing if the Products model functions work correctly', () => {
         const name = 'Samsung';
         const price = 2000;
         const result = await products.addProductToDB(name, price);
-        expect(result[0]).toEqual({
-            id: result[0].id,
+        expect(result).toEqual({
+            id: result.id,
             name: 'Samsung',
             price: 2000,
         });

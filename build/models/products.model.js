@@ -13,7 +13,7 @@ class Products {
             const sql = `INSERT INTO products (name,price) VALUES ($1,$2) RETURNING *`;
             const addedProductes = await conn.query(sql, [productName, price]);
             conn.release();
-            return addedProductes.rows;
+            return addedProductes.rows[0];
         }
         catch (error) {
             throw new Error(`couldnt add product to DB: ${error}`);

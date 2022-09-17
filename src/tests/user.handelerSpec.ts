@@ -30,7 +30,7 @@ describe('POST /users', function () {
         const response = await request(app)
             .post('/users')
             //request body
-            .send({ username: 'john', password: 'jhon@123' });
+            .send({ username: 'john',email:'jhon@gmail.com', password: 'jhon@123' });
         expect(response.status).toEqual(200);
         users.deleteAllusers();
     });
@@ -39,12 +39,13 @@ describe('POST /users', function () {
 describe('POST /users/signin', function () {
     it('response status 200', async function () {
         const username: string = 'john';
+        const email: string = 'john@gmail.com';
         const password: string = 'jhon@123';
-        await users.createUser(username, password);
+        await users.createUser(username,email, password);
         const response = await request(app)
             .post('/users/signin')
             //request body
-            .send({ username: 'john', password: 'jhon@123' });
+            .send({ email: 'john@gmail.com', password: 'jhon@123' });
         expect(response.status).toEqual(200);
         users.deleteAllusers();
     });

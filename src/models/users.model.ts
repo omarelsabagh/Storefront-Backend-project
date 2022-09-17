@@ -3,39 +3,40 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 
 //type of the user
-interface User {
+export interface User {
     id?: number | string;
     username: string;
+    email: string;
     password: string;
     check?: string | number;
 }
 
 export class Users {
     //create user
-    async createUser(userName: string, userPassword: string): Promise<User> {
+    async createUser(userName: string,email:string, userPassword: string): Promise<User> {
         try {
             const conn = await Client.connect();
-            const sql1 = `SELECT * FROM users WHERE username=$1`;
-            const returnedUser = await conn.query(sql1, [userName]);
-            //checking if the username from request already exist in database
+            const sql1 = `SELECT * FROM users WHERE email=$1`;
+            const returnedUser = await conn.query(sql1, [email]);
+            //checking if the email from request already exist in database
 
             if (returnedUser.rows.length > 0) {
                 //if yes add a new property to the returned object and return it
                 returnedUser.rows[0].check = 1;
                 return returnedUser.rows[0];
             } else {
-                //if the user not registered before then hash the password and add the user to DB
+                //if the email not registered before then hash the password and add the user to DB
                 dotenv.config();
                 const saltRounds = process.env.SALT_ROUNDS;
                 const pepper = process.env.BCRYPT_PASSWORD;
 
                 const conn = await Client.connect();
-                const sql = `INSERT INTO users (username,password) VALUES ($1,$2) RETURNING *`;
+                const sql = `INSERT INTO users (username,email,password) VALUES ($1,$2,$3) RETURNING *`;
                 const hash = bcrypt.hashSync(
                     userPassword + pepper,
                     parseInt(`${saltRounds}`)
                 );
-                const addedUsers = await conn.query(sql, [userName, hash]);
+                const addedUsers = await conn.query(sql, [userName,email, hash]);
 
                 conn.release();
                 return addedUsers.rows[0];
@@ -48,15 +49,15 @@ export class Users {
     //signin users and auth function
 
     async signUsers(
-        userName: string,
+        userEmail: string,
         userPassword: string
     ): Promise<User | null> {
         try {
             const pepper = process.env.BCRYPT_PASSWORD;
-
+             
             const conn = await Client.connect();
-            const sql = `select * from users where username=$1`;
-            const result = await conn.query(sql, [userName]);
+            const sql = `select * from users where email=$1`;
+            const result = await conn.query(sql, [userEmail]);
             //checking if the username from request is in DB
             if (result.rows.length) {
                 //if yes check if the password entered is correct

@@ -19,10 +19,11 @@ describe('Testing if the Order model functions are defined', () => {
 describe('Testing if the Order model functions work correctly', () => {
     it('Expect create method to return object', async () => {
         const username: string = 'Omar';
+        const email: string = 'Omar@gamil.com';
         const password: string = 'omar@123';
 
         //create user for foriegn key
-        const user = await users.createUser(username, password);
+        const user = await users.createUser(username,email, password);
         const status: string = 'active';
         const userID: string = user.id as string;
         const result = await orders.addOrder(status, userID);

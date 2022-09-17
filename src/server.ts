@@ -11,4 +11,5 @@ const port = process.env.PORT;
 // allRoutes file in routes folder
 fetchAllRoutes(app);
 
-app.listen(port);
+app.listen(port,()=>{console.log("server is running");
+});

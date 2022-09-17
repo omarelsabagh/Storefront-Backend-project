@@ -14,9 +14,10 @@ const orders = new Orders();
 describe('POST /orders/:id', function () {
     it('response status 401 no token', async function () {
         const username: string = 'john';
+        const email: string = 'john@gmail.com';
         const password: string = 'jhon@123';
         //create user for foriegn key
-        const addedUser = await users.createUser(username, password);
+        const addedUser = await users.createUser(username,email, password);
         const userId = addedUser.id;
         const response = await request(app)
             .post(`/orders/${userId}`)

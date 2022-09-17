@@ -9,8 +9,10 @@ const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const allRoutes_1 = require("./routes/allRoutes");
 exports.app = (0, express_1.default)();
+//env variable for the port
 const port = process.env.PORT;
+// allRoutes file in routes folder
 (0, allRoutes_1.fetchAllRoutes)(exports.app);
 exports.app.listen(port, () => {
-    console.log(`local server is working on port: ${port}`);
+    console.log("server is running");
 });

@@ -19,9 +19,10 @@ describe('POST /orders/:id/products', function () {
     it('response status 401 no token', async function () {
         //add user
         const username: string = 'Omar';
+        const email: string = 'Omar@gamil.com';
         const password: string = 'omar@123';
 
-        const user = await users.createUser(username, password);
+        const user = await users.createUser(username,email, password);
 
         //add product
         const name: string = 'Samsung';

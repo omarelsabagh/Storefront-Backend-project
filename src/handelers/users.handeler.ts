@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { Users } from '../models/users.model';
+import { Users, User } from '../models/users.model';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import authMiddleware from './../middlewares/authmiddleware';
@@ -17,14 +17,15 @@ const users = new Users();
 //create user
 async function create(req: Request, res: Response) {
     try {
-        const username: string = req.body.username;
-        const password: string = req.body.password;
+        // const username: string = req.body.username;
+        // const password: string = req.body.password;
+        const {username,email,password}:User = req.body
 
-        const addedUser = await users.createUser(username, password);
+        const addedUser = await users.createUser(username,email, password);
         //if the user is registered before check if there add key to the object called check with value 1
         if (addedUser.check == 1) {
             res.json({
-                Error: 'username registered already, try another name',
+                message: 'error: username registered already, try another name',
             });
         } else {
             res.json({
@@ -41,9 +42,12 @@ async function create(req: Request, res: Response) {
 
 async function signin(req: Request, res: Response) {
     try {
-        const username: string = req.body.username;
-        const password: string = req.body.password;
-        const signeduser = await users.signUsers(username, password);
+        
+        let email = req.body.email
+        const password = req.body.password
+
+        
+        const signeduser = await users.signUsers(email, password);
         if (signeduser) {
             //CREATE THE TOKEN
             const Token = jwt.sign(

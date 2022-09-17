@@ -30,13 +30,15 @@ describe('Testing if the User model functions work correctly', () => {
 
     it('Expect CREATE method to return object', async () => {
         const username: string = 'Omar';
+        const email: string = 'Omar@gamil.com';
         const password: string = 'omar@123';
 
-        const result = await users.createUser(username, password);
+        const result = await users.createUser(username,email, password);
 
         expect(result).toEqual({
             id: result.id,
             username: 'Omar',
+            email: 'Omar@gamil.com',
             password: result.password,
         });
 
@@ -46,15 +48,17 @@ describe('Testing if the User model functions work correctly', () => {
 
     it('Expect signin method to return object', async () => {
         const username: string = 'Omar';
+        const email: string = 'Omar@gamil.com';
         const password: string = 'omar@123';
         //creating user to check on it
-        await users.createUser(username, password);
-        const result = await users.signUsers(username, password);
+        await users.createUser(username,email, password);
+        const result = await users.signUsers(email, password);
         //condition if the function worked correctly
         if (result !== null) {
             expect(result).toEqual({
                 id: result.id,
                 username: 'Omar',
+                email: 'Omar@gamil.com',
                 password: result.password,
             });
             //cleaning database for other tests

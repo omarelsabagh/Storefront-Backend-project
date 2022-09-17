@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+//to use the testing environment for testing
 process.env.ENV = 'test';
 const supertest_1 = __importDefault(require("supertest"));
 const server_1 = require("./../server");
@@ -20,25 +21,29 @@ describe('POST /orders/:id/products', function () {
     it('response status 401 no token', async function () {
         //add user
         const username = 'Omar';
+        const email = 'Omar@gamil.com';
         const password = 'omar@123';
-        const user = await users.createUser(username, password);
+        const user = await users.createUser(username, email, password);
         //add product
         const name = 'Samsung';
         const price = 2000;
         const product = await products.addProductToDB(name, price);
         //add order by user
         const status = 'active';
-        const userID = (user.id);
+        const userID = user.id;
         const order = await orders.addOrder(status, userID);
         //add product to order
         //order id forign key from orders table id
-        const orderId = order[0].id;
+        const orderId = order.id;
         //product id forign key from products table id
-        const productId = product[0].id;
+        const productId = product.id;
         const response = await (0, supertest_1.default)(server_1.app)
             .post(`/orders/${orderId}/products`)
+            //request body
             .send({ quantity: 20, productid: productId });
+        //expect the response to be 401 because no token provided. not authurized
         expect(response.status).toEqual(401);
+        //clean database
         await orderproducts.deleteAllOrderProducts();
         await orders.deleteAllOrders();
         await products.deleteAllProducts();

@@ -5,47 +5,59 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
+//to use the testing environment for testing
 process.env.ENV = 'test';
 const users_model_1 = require("../models/users.model");
+//getting the users Model
 const users = new users_model_1.Users();
-describe('Testing if the User model functions are defined', () => {
-    it('Expect index model to be defined', () => {
+//tsting if functions defined
+describe('Testing if the USER model functions are defined', () => {
+    it('Expect INDEX model to be defined', () => {
         expect(users.getAllUsers).toBeDefined();
     });
-    it('Expect create model to be defined', () => {
+    it('Expect CREATE model to be defined', () => {
         expect(users.createUser).toBeDefined();
     });
-    it('Expect show model to be defined', () => {
+    it('Expect SHOW model to be defined', () => {
         expect(users.getOneUser).toBeDefined();
     });
 });
+//tsting if functions work correctly
 describe('Testing if the User model functions work correctly', () => {
-    it('Expect index method to return empty array', async () => {
+    it('Expect INDEX method to return empty array', async () => {
         const result = await users.getAllUsers();
         expect(result).toEqual([]);
     });
-    it('Expect create method to return object', async () => {
+    it('Expect CREATE method to return object', async () => {
         const username = 'Omar';
+        const email = 'Omar@gamil.com';
         const password = 'omar@123';
-        const result = await users.createUser(username, password);
+        const result = await users.createUser(username, email, password);
         expect(result).toEqual({
             id: result.id,
             username: 'Omar',
+            email: 'Omar@gamil.com',
             password: result.password,
         });
+        //cleaning database for other tests
         users.deleteAllusers();
     });
     it('Expect signin method to return object', async () => {
         const username = 'Omar';
+        const email = 'Omar@gamil.com';
         const password = 'omar@123';
-        await users.createUser(username, password);
-        const result = await users.signUsers(username, password);
+        //creating user to check on it
+        await users.createUser(username, email, password);
+        const result = await users.signUsers(email, password);
+        //condition if the function worked correctly
         if (result !== null) {
             expect(result).toEqual({
                 id: result.id,
                 username: 'Omar',
+                email: 'Omar@gamil.com',
                 password: result.password,
             });
+            //cleaning database for other tests
             users.deleteAllusers();
         }
     });

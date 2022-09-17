@@ -13,7 +13,7 @@ class Orders {
             const sql = `INSERT INTO orders ( status,user_id ) VALUES ($1,$2) RETURNING *`;
             const addedOrders = await conn.query(sql, [orderStatus, userId]);
             conn.release();
-            return addedOrders.rows;
+            return addedOrders.rows[0];
         }
         catch (error) {
             throw new Error(`couldnt add an order: ${error}`);

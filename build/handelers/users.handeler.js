@@ -19,18 +19,20 @@ const users = new users_model_1.Users();
 //create user
 async function create(req, res) {
     try {
-        const username = req.body.username;
-        const password = req.body.password;
-        const addedUser = await users.createUser(username, password);
+        // const username: string = req.body.username;
+        // const password: string = req.body.password;
+        const { username, email, password } = req.body;
+        const addedUser = await users.createUser(username, email, password);
+        //if the user is registered before check if there add key to the object called check with value 1
         if (addedUser.check == 1) {
             res.json({
-                Error: 'username registered already, try another name',
+                message: 'error: username registered already, try another name',
             });
         }
         else {
             res.json({
                 message: 'user added to DB successfully',
-                addedUser: addedUser
+                addedUser: addedUser,
             });
         }
     }
@@ -42,10 +44,12 @@ async function create(req, res) {
 //signin users
 async function signin(req, res) {
     try {
-        const username = req.body.username;
+        let email = req.body.email;
         const password = req.body.password;
-        const signeduser = await users.signUsers(username, password);
+        // email = `'${email}'`
+        const signeduser = await users.signUsers(email, password);
         if (signeduser) {
+            //CREATE THE TOKEN
             const Token = jsonwebtoken_1.default.sign({ user: signeduser }, `${process.env.TOKEN_SECRET}`);
             res.json({ message: 'sign in success', signeduser, Token });
         }
